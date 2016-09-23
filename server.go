@@ -1,6 +1,7 @@
 package main
 
 import (
+    "os"
     "github.com/kataras/iris"
     "github.com/disiko/disiko-backend/api"
 )
@@ -8,7 +9,7 @@ import (
 func main() {
     // configuration
     baseApiUrl := "/api/"
-    port := ":8080"
+    port := ":"+os.Getenv("PORT")
 
     net := iris.New()
     net.Post(baseApiUrl+"scraper", api.GetScraper)
