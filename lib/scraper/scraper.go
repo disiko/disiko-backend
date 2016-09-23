@@ -2,6 +2,7 @@ package scraper
 
 import (
   "log"
+  "strings"
   "net/http"
   "io/ioutil"
   "encoding/json"
@@ -19,28 +20,43 @@ type Data struct {
     source string
 }
 
-func parser() (data []map[string]string){
-    doc, err := goquery.NewDocument("http://metalsucks.net")
+func GetAllData(q string) (allData [][]Data) {
+    allData = append(allData, GetTokopedia(q))
+    allData = append(allData, GetBukalapak(q))
+
+    return allData
+}
+
+func Parser(url, catalogClass, sellerClass, priceClass, nameClass, sourceName, urlClass, imageUrlClass, locationClass string) (data []Data){
+    doc, err := goquery.NewDocument(url)
 
     if err != nil {
         log.Print(err)
         return
     }
 
-    doc.Find(".sidebar-reviews article .content-block").Each(func(i int, s *goquery.Selection) {
+    doc.Find(catalogClass).Each(func(i int, s *goquery.Selection) {
 
-        band := s.Find("a").Text()
-        title := s.Find("i").Text()
-        data = append(data, map[string]string{"band": band, "title": title})
+        seller := strings.Replace(s.Find(sellerClass).Text(), "\n", "", -1)
+        location := strings.Replace(s.Find(locationClass).Text(), "\n", "", -1)
+        price := strings.Replace(s.Find(priceClass).Text(), "\n", "", -1)
+        name := strings.Replace(s.Find(nameClass).Text(), "\n", "", -1)
+        source := sourceName
+        url,_ := s.Find(urlClass).Attr("href")
+        imageUrl,_ := s.Find(imageUrlClass).Attr("src")
+        data = append(data, Data {
+            name,
+            url,
+            imageUrl,
+            price,
+            location,
+            seller,
+            source,
+        })
+
     })
 
     return
-}
-
-func GetAllData(q string) (allData [][]Data) {
-    allData = append(allData, GetTokopedia(q))
-
-    return allData
 }
 
 func GetTokopedia(q string) (data []Data) {
@@ -82,11 +98,21 @@ func GetTokopedia(q string) (data []Data) {
         }
     }
 
-    return data
+    return 
 }
 
 func GetBukalapak(q string) (data []Data) {
-    return data
+    data = Parser(
+        "https://www.bukalapak.com/products?utf8=%E2%9C%93&search%5Bkeywords%5D="+q,
+        ".product-card",
+        ".user__name",
+        ".product-price amount",
+        ".product__name",
+        "bukalapak",
+        ".product__name",
+        ".product-media__img",
+        ".user-city")
+    return 
 }
 
 func GetBlibli(q string) (data []map[string]string) {
@@ -100,16 +126,4 @@ func GetLazada(q string) (data []map[string]string) {
 func isJSON(s string) bool {
     var js map[string]interface{}
     return json.Unmarshal([]byte(s), &js) == nil
-}
-
-func parseBukalapak() (data []Data) {
-    return
-}
-
-func parseBlibli() (data []Data) {
-    return
-}
-
-func parseLazada() (data []Data) {
-    return
 }

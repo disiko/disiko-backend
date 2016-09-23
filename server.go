@@ -3,7 +3,7 @@ package main
 import (
     "os"
     "github.com/kataras/iris"
-    "disiko-backend/api"
+    "github.com/disiko/disiko-backend/api"
 )
 
 func main() {
