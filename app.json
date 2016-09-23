@@ -1,0 +1,12 @@
+{
+  "name": "Disiko",
+  "description": "Disiko prototype app",
+  "keywords": [
+    "disiko",
+    "go",
+  ],
+  "image": "heroku/go:1.6",
+  "mount_dir": "src/github.com/disiko/disiko-backend",
+  "website": "http://github.com/disiko/disiko-backend",
+  "repository": "http://github.com/disiko/disiko-backend"
+}
