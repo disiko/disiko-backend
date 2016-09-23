@@ -8,7 +8,7 @@ import (
 func main() {
     // configuration
     baseApiUrl := "/api/"
-    port := ":8080"
+    port := ":80"
 
     net := iris.New()
     net.Post(baseApiUrl+"scraper", api.GetScraper)
