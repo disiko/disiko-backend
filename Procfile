@@ -1,1 +1,1 @@
-web: disiko
+web: disiko-backend
