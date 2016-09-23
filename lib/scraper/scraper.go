@@ -23,6 +23,8 @@ type Data struct {
 func GetAllData(q string) (allData [][]Data) {
     allData = append(allData, GetTokopedia(q))
     allData = append(allData, GetBukalapak(q))
+    allData = append(allData, GetBlibli(q))
+    allData = append(allData, GetLazada(q))
 
     return allData
 }
@@ -115,12 +117,32 @@ func GetBukalapak(q string) (data []Data) {
     return 
 }
 
-func GetBlibli(q string) (data []map[string]string) {
-    return data
+func GetBlibli(q string) (data []Data) {
+    data = Parser(
+        "https://www.blibli.com/search?s="+q,
+        "#catalogProductListContentDiv .large-4",
+        ".user__name",
+        ".new-price-text",
+        ".product-title",
+        "blibli",
+        ".single-product",
+        ".lazy",
+        ".user-city")
+    return 
 }
 
-func GetLazada(q string) (data []map[string]string) {
-    return data
+func GetLazada(q string) (data []Data) {
+    data = Parser(
+        "http://www.lazada.co.id/catalog/?q="+q,
+        ".product-card",
+        ".user__name",
+        ".product-card__price",
+        ".product-card__name",
+        "lazada",
+        "a",
+        "img",
+        ".user-city")
+    return 
 }
 
 func isJSON(s string) bool {
