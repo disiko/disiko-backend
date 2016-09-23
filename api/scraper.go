@@ -3,11 +3,18 @@ package api
 import (
     "strings"
     "github.com/kataras/iris"
-    "github.com/disiko/disiko-backend/lib/scraper"
+    "disiko-backend/lib/scraper"
+    "fmt"
 )
 
-func GetScraper(ctx *iris.Context){
-    q:= ctx.PostValue("q")
+func GetScraper(ctx *iris.Context) {
+    q := ctx.PostValue("q")
     q = strings.Replace(q, " ", "+", -1)
-    ctx.Render("application/json", scraper.GetTokopedia(q))
+
+    allData := scraper.GetAllData(q)
+
+    fmt.Println(allData)
+    // TODO Filter all data
+
+    ctx.Render("application/json", iris.Map{"foo": "bar"})
 }
