@@ -17,6 +17,7 @@ type FilteredRequest struct {
 }
 
 // GetFiltered return filtered items with specific user params
+// Exmaple {baseAPIURL}search?q=psp&order=name&dir=asc
 func GetFiltered(ctx *iris.Context) {
 	filteredReq := FilteredRequest{}
 	err := ctx.ReadForm(&filteredReq)
