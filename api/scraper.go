@@ -3,8 +3,7 @@ package api
 import (
     "strings"
     "github.com/kataras/iris"
-    "github.com/disiko/disiko-backend/lib/scraper"
-    "fmt"
+    "disiko-backend/lib/scraper"
 )
 
 func GetScraper(ctx *iris.Context) {
@@ -12,9 +11,6 @@ func GetScraper(ctx *iris.Context) {
     q = strings.Replace(q, " ", "+", -1)
 
     allData := scraper.GetAllData(q)
-    
-    fmt.Println(allData)
-    // TODO Filter all data
 
-    ctx.Render("application/json", iris.Map{"foo": "bar"})
+    ctx.Render("application/json", allData)
 }

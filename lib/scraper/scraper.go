@@ -6,25 +6,27 @@ import (
   "net/http"
   "io/ioutil"
   "encoding/json"
+  "regexp"
   "github.com/PuerkitoBio/goquery"
   "github.com/antonholmquist/jason"
+  "strconv"
 )
 
 type Data struct {
-    name string
-    url string
-    imageUrl string
-    price string
-    location string
-    seller string
-    source string
+    Name string
+    Url string
+    ImageUrl string
+    Price int64
+    Location string
+    Seller string
+    Source string
 }
 
-func GetAllData(q string) (allData [][]Data) {
-    allData = append(allData, GetTokopedia(q))
-    allData = append(allData, GetBukalapak(q))
-    allData = append(allData, GetBlibli(q))
-    allData = append(allData, GetLazada(q))
+func GetAllData(q string) (allData []Data) {
+    allData = append(allData, GetTokopedia(q)...)
+    allData = append(allData, GetBukalapak(q)...)
+    // allData = append(allData, GetBlibli(q)...)
+    allData = append(allData, GetLazada(q)...)
 
     return allData
 }
@@ -50,7 +52,7 @@ func Parser(url, catalogClass, sellerClass, priceClass, nameClass, sourceName, u
             name,
             url,
             imageUrl,
-            price,
+            formatPrice(price),
             location,
             seller,
             source,
@@ -92,7 +94,7 @@ func GetTokopedia(q string) (data []Data) {
                 name,
                 url,
                 imageUrl,
-                price,
+                formatPrice(price),
                 location,
                 seller,
                 source,
@@ -100,7 +102,7 @@ func GetTokopedia(q string) (data []Data) {
         }
     }
 
-    return 
+    return
 }
 
 func GetBukalapak(q string) (data []Data) {
@@ -114,7 +116,7 @@ func GetBukalapak(q string) (data []Data) {
         ".product__name",
         ".product-media__img",
         ".user-city")
-    return 
+    return
 }
 
 func GetBlibli(q string) (data []Data) {
@@ -128,7 +130,7 @@ func GetBlibli(q string) (data []Data) {
         ".single-product",
         ".lazy",
         ".user-city")
-    return 
+    return
 }
 
 func GetLazada(q string) (data []Data) {
@@ -142,10 +144,22 @@ func GetLazada(q string) (data []Data) {
         "a",
         "img",
         ".user-city")
-    return 
+    return
 }
 
 func isJSON(s string) bool {
     var js map[string]interface{}
     return json.Unmarshal([]byte(s), &js) == nil
+}
+
+func formatPrice(price string) int64 {
+    reg := regexp.MustCompile(`[^0-9]`)
+    strPrice := reg.ReplaceAllString(price, "")
+    intPrice, err := strconv.ParseInt(strPrice, 10, 64)
+
+    if err != nil {
+        return 0
+    }
+
+    return intPrice
 }
