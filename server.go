@@ -1,21 +1,25 @@
 package main
 
 import (
-    "os"
-    "github.com/kataras/iris"
-    "disiko-backend/api"
+	"disiko-backend/api"
+	"os"
+
+	"github.com/kataras/iris"
 )
 
 func main() {
-    // configuration
-    baseApiUrl := "/api/"
-    port := ":"+os.Getenv("PORT")
+	// configuration
+	baseAPIURL := "/api/"
+	port := ":" + os.Getenv("PORT")
 
-    if (port == ":") {
-        port = ":9999"
-    }
+	if port == ":" {
+		port = ":9999"
+	}
 
-    net := iris.New()
-    net.Post(baseApiUrl+"scraper", api.GetScraper)
-    net.Listen(port)
+	net := iris.New()
+
+	net.Get(baseAPIURL+"featured", api.GetFeatured)
+	net.Get(baseAPIURL+"search", api.GetFiltered)
+
+	net.Listen(port)
 }
