@@ -77,7 +77,7 @@ func parser(url, catalogClass, sellerClass, priceClass, nameClass, sourceName, u
 		url, _ := s.Find(urlClass).Attr("href")
 		imageURL, _ := s.Find(imageURLClass).Attr("src")
 		data = append(data, Data{
-			name,
+			strings.TrimSpace(name),
 			url,
 			imageURL,
 			formatPrice(price),
@@ -120,7 +120,7 @@ func GetTokopedia(q string) (data []Data) {
 			seller, _ := shop.GetString("name")
 
 			data = append(data, Data{
-				name,
+				strings.TrimSpace(name),
 				url,
 				imageURL,
 				formatPrice(price),
