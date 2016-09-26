@@ -64,7 +64,7 @@ func GetAllData(q string) (allData []Data) {
 	allData = append(allData, chanToSlice(chan3)...)
 	allData = append(allData, chanToSlice(chan4)...)
 	allData = append(allData, chanToSlice(chan5)...)
-	sort.Sort(PriceDesc(allData))
+	sort.Sort(PriceAsc(allData))
 	return allData
 }
 
@@ -163,7 +163,7 @@ func GetBukalapak(q string) (data []Data) {
 		"https://www.bukalapak.com/products?utf8=%E2%9C%93&search%5Bkeywords%5D="+q,
 		".product-card",
 		".user__name",
-		".product-price amount",
+		".product-price .amount",
 		".product__name",
 		"bukalapak",
 		".product__name",
