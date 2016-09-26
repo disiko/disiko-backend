@@ -8,6 +8,7 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+	"sort"
 
 	"github.com/PuerkitoBio/goquery"
 	"github.com/antonholmquist/jason"
@@ -24,30 +25,46 @@ type Data struct {
 	Source   string
 }
 
+type PriceAsc []Data
+
+func (a PriceAsc) Len() int           { return len(a) }
+func (a PriceAsc) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
+func (a PriceAsc) Less(i, j int) bool { return a[i].Price < a[j].Price }
+
+type PriceDesc []Data
+
+func (a PriceDesc) Len() int           { return len(a) }
+func (a PriceDesc) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
+func (a PriceDesc) Less(i, j int) bool { return a[i].Price > a[j].Price }
+
 // GetAllData return all array of Data struct from selected marketplace
 func GetAllData(q string) (allData []Data) {
 	chan1 := make(chan []Data, 1)
 	chan2 := make(chan []Data, 1)
 	chan3 := make(chan []Data, 1)
 	chan4 := make(chan []Data, 1)
+	chan5 := make(chan []Data, 1)
 
 	go func() {
 		chan1 <- GetTokopedia(q)
 		chan2 <- GetBukalapak(q)
 		chan3 <- GetLazada(q)
 		chan4 <- GetBlibli(q)
+		chan5 <- GetKaskus(q)
 
 		close(chan1)
 		close(chan2)
 		close(chan3)
 		close(chan4)
+		close(chan5)
 	}()
 
 	allData = append(allData, chanToSlice(chan1)...)
 	allData = append(allData, chanToSlice(chan2)...)
 	allData = append(allData, chanToSlice(chan3)...)
 	allData = append(allData, chanToSlice(chan4)...)
-
+	allData = append(allData, chanToSlice(chan5)...)
+	sort.Sort(PriceDesc(allData))
 	return allData
 }
 
@@ -68,14 +85,20 @@ func parser(url, catalogClass, sellerClass, priceClass, nameClass, sourceName, u
 	}
 
 	doc.Find(catalogClass).Each(func(i int, s *goquery.Selection) {
-
 		seller := strings.Replace(s.Find(sellerClass).Text(), "\n", "", -1)
 		location := strings.Replace(s.Find(locationClass).Text(), "\n", "", -1)
 		price := strings.Replace(s.Find(priceClass).Text(), "\n", "", -1)
 		name := strings.Replace(s.Find(nameClass).Text(), "\n", "", -1)
 		source := sourceName
 		url, _ := s.Find(urlClass).Attr("href")
-		imageURL, _ := s.Find(imageURLClass).Attr("src")
+		var imageURL string;
+		if source != "kaskus" {
+			imageURL, _ = s.Find(imageURLClass).Attr("src")
+		} else {
+			imageURL, _ = s.Find(imageURLClass).Attr("style")
+			imageURL = strings.Replace(imageURL, "background-image:url(", "", -1)
+			imageURL = strings.Replace(imageURL, ")", "", -1)
+		}
 		data = append(data, Data{
 			strings.TrimSpace(name),
 			url,
@@ -176,6 +199,21 @@ func GetLazada(q string) (data []Data) {
 		"a",
 		"img",
 		".user-city")
+	return
+}
+
+// GetKaskus return item list from kaskus.co.id
+func GetKaskus(q string) (data []Data) {
+	data = parser(
+		"http://www.kaskus.co.id/search/fjb?q="+q,
+		".product__item",
+		".username",
+		".price--discounted",
+		".title a",
+		"kaskus",
+		".title a",
+		".image__photo",
+		".info__location")
 	return
 }
 
