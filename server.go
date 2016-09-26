@@ -1,7 +1,7 @@
 package main
 
 import (
-	"disiko-backend/api"
+	"github.com/disiko/disiko-backend/api"
 	"os"
 
 	"github.com/kataras/iris"

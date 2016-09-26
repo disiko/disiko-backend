@@ -1,7 +1,7 @@
 package api
 
 import (
-	"disiko-backend/lib/scraper"
+	"github.com/disiko/disiko-backend/lib/scraper"
 	"fmt"
 	"strings"
 
